@@ -19,7 +19,7 @@ public interface ClickEventRepo extends JpaRepository<ClickEvent, Long>{
 			SELECT ce
 			from ClickEvent ce
 			where ce.urlMapping = :urlMapping
-			and ce.clickDate between :start AND :end
+			AND ce.clickDate between :start AND :end
 			""")
 	List<ClickEvent> findClicksByUrlMappingAndDateRange(
 			@Param("urlMapping") UrlMapping urlMapping,

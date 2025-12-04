@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import dtos.ClickEventDto;
@@ -25,17 +28,22 @@ public class UrlMappingService {
 	private final UserService userService;
 	private final UrlMappingRepo urlMappingRepo;
 	private final ClickEventRepo clickEventRepo;
+	private final UrlCachingService urlCachingService;
+	
+	private Logger logger = LoggerFactory.getLogger(UrlMappingService.class);
 	
 	private static final SecureRandom random = new SecureRandom();
 	private static final String CHARACTERS =
 	        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	private static final int SHORT_LENGTH = 6;
 	
-	public UrlMappingService(UserService userService, UrlMappingRepo urlMappingRepo, ClickEventRepo clickEventRepo) {
+	public UrlMappingService(UserService userService, UrlMappingRepo urlMappingRepo, ClickEventRepo clickEventRepo, 
+			UrlCachingService urlCachingService) {
 		super();
 		this.userService = userService;
 		this.urlMappingRepo = urlMappingRepo;
 		this.clickEventRepo = clickEventRepo;
+		this.urlCachingService = urlCachingService;
 	}
 
 	public UrlMappingDto createShortUrl(String originalUrl, Users user) {
@@ -60,8 +68,10 @@ public class UrlMappingService {
 		urlMapping.setOriginalUrl(originalUrl);
 		urlMapping.setUser(user);
 		UrlMapping savedUrlMapping = this.urlMappingRepo.save(urlMapping);
-		return convertToDto(savedUrlMapping);
 		
+	    UrlMappingDto dto =  convertToDto(savedUrlMapping);
+	    this.urlCachingService.saveUrl(shortUrl, originalUrl);
+		return dto;
 	}
 	
 	private UrlMappingDto convertToDto(UrlMapping savedUrlMapping) {
@@ -112,12 +122,19 @@ public class UrlMappingService {
 		UrlMapping urlMapping = this.urlMappingRepo.findByShortUrl(shortUrl);  // single urlMapping is returned for a given shortUrl
 		
 		if(urlMapping == null) {
+			logger.info("No ShortUrl mapiing for: " + shortUrl + " exits");
+			System.out.println("No ShortUrl mapiing for: " + shortUrl + " exits");
 			return new ArrayList<>(); // return empty list if URL not found
 		}
 		
+		logger.info("ShortUrl mapiing for: " + shortUrl + " exits");
+		System.out.println("ShortUrl mapiing for: " + shortUrl + " exits");
 		// Now Fetch all the click events from this particular URL in the date range
 		List<ClickEvent> clicks = this.clickEventRepo.findClicksByUrlMappingAndDateRange(urlMapping, start, end);
 		
+		if(clicks == null) {
+			logger.info("Failed to find the click events");
+		}
 		// Group clicks by date and count them
 		Map<LocalDate, Integer> clicksByDate = new HashMap<>(); 
 		
@@ -172,6 +189,28 @@ public class UrlMappingService {
 		
 		return clicksByDate;
 		
+	}
+
+	// get the UrlMapping, record the click and ClickEvent and return the urlMapping
+	public UrlMapping getOriginalUrl(String shortUrl) {
+		
+		String Original = this.urlCachingService.getUrlMappingDto(shortUrl);
+		
+		UrlMapping urlMapping = this.urlMappingRepo.findByShortUrl(shortUrl);
+		
+		
+		if(urlMapping != null) {
+			urlMapping.setClickCount(urlMapping.getClickCount() +1);
+			urlMappingRepo.save(urlMapping);
+			
+			// Now record the click Event as well
+			ClickEvent clickEvent = new ClickEvent();
+			clickEvent.setClickDate(LocalDateTime.now());
+			clickEvent.setUrlMapping(urlMapping);
+			clickEventRepo.save(clickEvent);
+		}
+		
+		return urlMapping;
 	}
 	
 	

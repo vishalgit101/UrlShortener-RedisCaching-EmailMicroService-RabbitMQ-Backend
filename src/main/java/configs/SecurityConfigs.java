@@ -45,6 +45,7 @@ public class SecurityConfigs {
 		
 		http.authorizeHttpRequests(request -> 
 			request.requestMatchers("/api/auth/public/**").permitAll()
+			.requestMatchers("/{shortUrl}").permitAll()
 			.anyRequest().authenticated());
 		
 		//http.formLogin(Customizer.withDefaults());
