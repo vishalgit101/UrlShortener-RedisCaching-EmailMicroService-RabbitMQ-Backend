@@ -12,7 +12,9 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import dtos.ClickEventDto;
 import dtos.UrlMappingDto;
@@ -44,6 +46,10 @@ public class UrlMappingService {
 		this.urlMappingRepo = urlMappingRepo;
 		this.clickEventRepo = clickEventRepo;
 		this.urlCachingService = urlCachingService;
+	}
+	
+	public UrlMapping findByShortUrl(String shortUrl) {
+		return this.urlMappingRepo.findByShortUrl(shortUrl);
 	}
 
 	public UrlMappingDto createShortUrl(String originalUrl, Users user) {
@@ -192,15 +198,16 @@ public class UrlMappingService {
 	}
 
 	// get the UrlMapping, record the click and ClickEvent and return the urlMapping
-	public UrlMapping getOriginalUrl(String shortUrl) {
-		
-		String Original = this.urlCachingService.getUrlMappingDto(shortUrl);
+	@Async
+	@Transactional
+	public void recordClickEvent(String shortUrl) {
 		
 		UrlMapping urlMapping = this.urlMappingRepo.findByShortUrl(shortUrl);
 		
+		//this.urlMappingRepo.incrementClick(shortUrl); uncomment it to handle race conditions when app grows, for now its fine
 		
 		if(urlMapping != null) {
-			urlMapping.setClickCount(urlMapping.getClickCount() +1);
+			urlMapping.setClickCount(urlMapping.getClickCount() +1); //put/replace this with the commented code above to deal with the race condition, with atomic increment
 			urlMappingRepo.save(urlMapping);
 			
 			// Now record the click Event as well
@@ -209,8 +216,6 @@ public class UrlMappingService {
 			clickEvent.setUrlMapping(urlMapping);
 			clickEventRepo.save(clickEvent);
 		}
-		
-		return urlMapping;
 	}
 	
 	
