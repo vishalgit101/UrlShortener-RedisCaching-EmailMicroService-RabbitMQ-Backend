@@ -11,6 +11,9 @@ import jakarta.validation.Valid;
 @Service
 public class EmailService {
 	
+	// This Service now only serve as place holder, EmailService is now moved to its own small service app
+	// with async event handling using RabbitMQ
+	
 	private final JavaMailSender mailSender;
 	// template dependency here for later purposes
 	

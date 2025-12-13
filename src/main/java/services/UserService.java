@@ -28,21 +28,24 @@ public class UserService {
 	private final RoleRepo roleRepo;
 	private final JwtService jwtService;
 	private final AuthenticationManager authManger;
-	private final EmailService emailService;
+	//private final EmailService emailService;
 	private final ConfirmationRepo confirmationRepo;
+	private final MailMessageProducerService mailMessageProducerService; 
 	
 	private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(8);
 	private Logger logger = LoggerFactory.getLogger(UserService.class);
 	
 	public UserService(UserRepo userRepo, RoleRepo roleRepo, JwtService jwtService, 
-			AuthenticationManager authManger, EmailService emailService, ConfirmationRepo confirmationRepo) {
+			AuthenticationManager authManger, 
+			ConfirmationRepo confirmationRepo, MailMessageProducerService mailMessageProducerService) {
 		super();
 		this.userRepo = userRepo;
 		this.roleRepo = roleRepo;
 		this.jwtService = jwtService;
 		this.authManger = authManger;
-		this.emailService = emailService;
+		//this.emailService = emailService; // got moved to a service with RabbitMQ
 		this.confirmationRepo = confirmationRepo;
+		this.mailMessageProducerService = mailMessageProducerService;
 	}
 	
 	public Users registerUser(UserRegisterDTO dto) {
@@ -73,7 +76,12 @@ public class UserService {
 	            existingConfimation.setCreated(LocalDateTime.now());
 	            this.confirmationRepo.save(existingConfimation); // updates it for the existing user
 	            
-	            this.emailService.sendSimpleMailMessage(existingUser.getFullName(), existingUser.getEmail(), existingConfimation.getToken());
+	            // the following part will be done in a seperate service using rabbitmq
+	            
+	            //this.emailService.sendSimpleMailMessage(existingUser.getFullName(), existingUser.getEmail(), existingConfimation.getToken());
+	            
+	            this.mailMessageProducerService.sendVerificationEmail(existingUser.getFullName(), existingUser.getEmail(), existingConfimation.getToken());
+	            
 	            // delete the previous token and send the new one
 	            
 	            return existingUser;
@@ -98,8 +106,10 @@ public class UserService {
 		Confirmation confirmation = new Confirmation(user);
 		this.confirmationRepo.save(confirmation);
 		
-		// now send the email
-		this.emailService.sendSimpleMailMessage(user.getFullName(), user.getEmail(), confirmation.getToken());
+		// now send the email || instead send the event to the Queue
+		//this.emailService.sendSimpleMailMessage(user.getFullName(), user.getEmail(), confirmation.getToken());
+        this.mailMessageProducerService.sendVerificationEmail(user.getFullName(), user.getEmail(), confirmation.getToken());
+
 		return user;
 	}
 	
@@ -168,6 +178,8 @@ public class UserService {
 		// later move the exception in the global exception handling
 		return this.userRepo.findUserByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
 	}
+	
+	// forgot  password logic comes here
 	
 	
 }
