@@ -9,11 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import dtos.PasswordResetRequestDto;
 import dtos.UserLoginDTO;
 import dtos.UserRegisterDTO;
 import entities.Users;
@@ -103,8 +105,29 @@ public class AuthController {
 			response.setRequestedMethod(request.getMethod());
 			
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-		}
+		}	
+	}
+	
+	
+	@PostMapping("/public/reset-password")
+	public ResponseEntity<?> resetPassword(@RequestParam("email")  String email) {
+		this.userService.resetPassword(email);
 		
+		return ResponseEntity.ok().body("Please check your email for password reset link");
+	}
+	
+	@PutMapping("/public/reset-password")
+	public ResponseEntity<?> updatePassword(@RequestBody PasswordResetRequestDto passwordReset){
+		if(!passwordReset.getNewPassword().equals(passwordReset.getConfirmPassword())) {
+			ResponseEntity.badRequest().body("Your password and confirmation password dont match");
+		}
+		boolean success = this.userService.verifyPasswordResetToken(passwordReset);
+		
+		if(success) {
+			return ResponseEntity.ok().body("Password got reset sucessfully");
+		}else {
+			return ResponseEntity.ok().body("Password reset request failed for some reason");
+		}
 		
 	}
 }

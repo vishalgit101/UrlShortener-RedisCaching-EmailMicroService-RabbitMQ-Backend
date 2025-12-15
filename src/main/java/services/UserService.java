@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import dtos.PasswordResetRequestDto;
 import dtos.UserLoginDTO;
 import dtos.UserRegisterDTO;
 import entities.Confirmation;
@@ -56,7 +57,7 @@ public class UserService {
 		if(existingUser != null) {
 			if(existingUser.isVerified()) {
 				logger.info("User exists");
-				throw new UserAlreadyExistsException("User with: " + dto.getEmail() +  " already exists");
+				throw new UserAlreadyExistsException("User with: " + dto.getEmail() +  " already exists and verified");
 			}else {
 	            logger.info("User exists but not verified");
 	            // place holder trigger resend verification email here and exit the method
@@ -163,11 +164,11 @@ public class UserService {
 			throw new RuntimeException("User is not verified. " + user.getFullName() + ", please verify you account before proceeding");
 		}
 		
-		Authentication authentication = this.authManger.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail(), userLoginDTO.getPassword())); 
+		Authentication authentication = this.authManger.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail().trim().toLowerCase(), userLoginDTO.getPassword())); 
 		
 		if(authentication.isAuthenticated()) {
 			// if successfully authenticated then generate the jwt token and send it to the frontend or store in http cookies
-			return this.jwtService.generateToken(userLoginDTO.getEmail());
+			return this.jwtService.generateToken(userLoginDTO.getEmail().trim().toLowerCase());
 		}
 		
 		// else throw the exception !
@@ -176,10 +177,63 @@ public class UserService {
 	
 	public Users findUserByEmail(String email) {
 		// later move the exception in the global exception handling
-		return this.userRepo.findUserByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
+		return this.userRepo.findUserByEmail(email.trim().toLowerCase()).orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
 	}
 	
 	// forgot  password logic comes here
+	public void resetPassword(String email) {
+		//  generate the token, save it to dB and send the request
+		Users user = this.userRepo.findUserByEmail(email.trim().toLowerCase()).orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
+		
+		if(!user.isVerified()) {
+			throw new RuntimeException("User need to verify first");
+		}
+		
+		Confirmation existsingConfirmation = confirmationRepo.findByUser(user).orElse(null);
+		
+		if(existsingConfirmation != null) {
+			//throw new RuntimeException("PasswordresetToken Already Existed, please send the password reset request again");
+			existsingConfirmation.setCreated(LocalDateTime.now());
+			existsingConfirmation.setToken(UUID.randomUUID().toString());
+			this.confirmationRepo.save(existsingConfirmation);
+			this.mailMessageProducerService.sendPasswordResetRequest(email, existsingConfirmation.getToken() );
+			logger.info("PasswordresetToken Already Existed, new token to your email={} has been sent", email );
+			
+			return;
+		}
+		
+		Confirmation confirmation = new Confirmation(user); // confirmation's constrctor auto generates the token
+		
+		this.confirmationRepo.save(confirmation);
+		
+		this.mailMessageProducerService.sendPasswordResetRequest(email, confirmation.getToken());
+	}
 	
+	public boolean verifyPasswordResetToken(PasswordResetRequestDto passwordReset) {
+		// verify the token, check for expiry and confirm then delete it
+		Confirmation confirmationToken = this.confirmationRepo.findByToken(passwordReset.getToken()).orElse(null);
+		
+		if(confirmationToken == null) {
+			//throw new RuntimeException("Password Reset Token does not exists, please send the password reset req again");
+			return false;
+		}
+		
+		// now check if the token exists and is not expired
+		boolean isValid = confirmationToken.getCreated().isAfter(LocalDateTime.now().minusMinutes(60));
+		// 60 minutes of password expiry
+		
+		if(!isValid) {
+			throw new RuntimeException("Password reset Timeout, please send the password reset req again");
+		}
+		
+		// if valid
+		Users user = confirmationToken.getUser();
+		
+		logger.info("Resetting Password for user with email:{}", user.getEmail());
+		user.setPassword(encoder.encode(passwordReset.getNewPassword()));
+		this.userRepo.save(user);
+		this.confirmationRepo.delete(confirmationToken);
+		return true;
+	}
 	
 }

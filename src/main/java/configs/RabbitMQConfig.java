@@ -19,10 +19,14 @@ public class RabbitMQConfig {
 	public static final String APP_EXCHANGE = "url.app.exchange";
 	
 	// Routing Key
-	public static final String EMAIL_ROUTING_KEY = "url.email";
+	public static final String EMAIL_VERIFICATION_ROUTING_KEY = "url.email.verification";
 	
-	// Queues
-	public static final String EMAIL_QUEUE = "url.email.queue";
+	public static final String EMAIL_PASSWORD_RESET_ROUTING_KEY = "url.email.password.reset";
+	
+	// Queues, technically not required on the producer side but still added it withou bindings as place holder if later binding is required for some reasons
+	public static final String EMAIL_VERIFICATION_QUEUE = "url.email.verification.queue";
+	
+	public static final String EMAIL_PASSWORD_RESET_QUEUE = "url.email.password.reset.queue";
 	
 	@Bean
 	public TopicExchange appExchange() {
