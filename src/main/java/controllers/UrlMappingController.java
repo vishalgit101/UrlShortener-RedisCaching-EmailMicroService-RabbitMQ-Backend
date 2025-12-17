@@ -6,6 +6,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -51,9 +55,13 @@ public class UrlMappingController {
 	
 	@GetMapping("/myUrls")
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<?> fetchAllUrlByUser(@AuthenticationPrincipal UserPrincipal principal){
+	public ResponseEntity<?> fetchAllUrlByUser(@AuthenticationPrincipal UserPrincipal principal, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size){
 		Users user = this.userService.findUserByEmail(principal.getUsername());
-		List<UrlMappingDto> urls = this.urlMappingService.getUrlsByUser(user);
+		
+		//List<UrlMappingDto> urls = this.urlMappingService.getUrlsByUser(user);
+		Page<UrlMappingDto> urls = this.urlMappingService.getUrlsByUser(user, page, size);
+				
 		return ResponseEntity.ok().body(urls);
 	}
 	

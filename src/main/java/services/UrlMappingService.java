@@ -11,6 +11,11 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,7 @@ import dtos.UrlMappingDto;
 import entities.ClickEvent;
 import entities.UrlMapping;
 import entities.Users;
+import exceptions.ResourceNotFoundException;
 import repos.ClickEventRepo;
 import repos.UrlMappingRepo;
 
@@ -123,6 +129,22 @@ public class UrlMappingService {
 		}
 		return urlMappingDtos;
 	}
+	
+	public Page<UrlMappingDto> getUrlsByUser(Users user, int page, int size){
+		
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
+		Page<UrlMapping> urlPage = urlMappingRepo.findByUser(user, pageable);
+		
+		List<UrlMappingDto> urlMappingDtos = new ArrayList<UrlMappingDto>();
+		
+		for(UrlMapping urlObj : urlPage.getContent()) {
+			urlMappingDtos.add(convertToDto(urlObj));
+		}
+		
+		Page<UrlMappingDto> dtoPage = new PageImpl<UrlMappingDto>(urlMappingDtos, pageable, urlPage.getTotalElements());
+		
+		return dtoPage;
+	}
 
 	public List<ClickEventDto> getClickEventsByDate(String shortUrl, LocalDateTime start, LocalDateTime end) {
 		UrlMapping urlMapping = this.urlMappingRepo.findByShortUrl(shortUrl);  // single urlMapping is returned for a given shortUrl
@@ -130,7 +152,7 @@ public class UrlMappingService {
 		if(urlMapping == null) {
 			logger.info("No ShortUrl mapiing for: " + shortUrl + " exits");
 			System.out.println("No ShortUrl mapiing for: " + shortUrl + " exits");
-			return new ArrayList<>(); // return empty list if URL not found
+			return new ArrayList<>(); // return empty list if URL not found or throw no Resource found
 		}
 		
 		logger.info("ShortUrl mapiing for: " + shortUrl + " exits");
@@ -140,6 +162,7 @@ public class UrlMappingService {
 		
 		if(clicks == null) {
 			logger.info("Failed to find the click events");
+			throw new ResourceNotFoundException("No click events between the request date found");
 		}
 		// Group clicks by date and count them
 		Map<LocalDate, Integer> clicksByDate = new HashMap<>(); 
@@ -215,6 +238,8 @@ public class UrlMappingService {
 			clickEvent.setClickDate(LocalDateTime.now());
 			clickEvent.setUrlMapping(urlMapping);
 			clickEventRepo.save(clickEvent);
+		}else {
+			throw new ResourceNotFoundException("No such short url exists in the database");
 		}
 	}
 	

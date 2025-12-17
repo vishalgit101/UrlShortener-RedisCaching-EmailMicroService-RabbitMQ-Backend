@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +17,9 @@ import dtos.UserRegisterDTO;
 import entities.Confirmation;
 import entities.Role;
 import entities.Users;
+import exceptions.ResourceConflictException;
+import exceptions.ResourceNotFoundException;
+import exceptions.TokenRelatedException;
 import exceptions.UserAlreadyExistsException;
 import repos.ConfirmationRepo;
 import repos.RoleRepo;
@@ -63,16 +65,17 @@ public class UserService {
 	            // place holder trigger resend verification email here and exit the method
 	            
 	            // update the older confirmation for the existing user
-	            Confirmation existingConfimation = confirmationRepo.findByUser(existingUser).orElseThrow(()-> new RuntimeException("Confirmation dont exists"));
+	            Confirmation existingConfimation = confirmationRepo.findByUser(existingUser).orElseThrow(()-> new ResourceNotFoundException("Confirmation dont exists"));
 	            
 	            // if its older than 24 hr refresh the token and send the email if not then tell the user to check inbox
 	            
 	            boolean val = existingConfimation.getCreated().isAfter(LocalDateTime.now().minusHours(24));
 	            
 	            if(val) {
-	            	throw new RuntimeException("Please check your inbox for verification code");
+	            	throw new TokenRelatedException("Please check your inbox for verification code or wait for 24 hour before requesting another verification link");
 	            }
 	            
+	            logger.info("Token got expired and deleteing the old confirmation and sending the new verification link");
 	            existingConfimation.setToken(UUID.randomUUID().toString());
 	            existingConfimation.setCreated(LocalDateTime.now());
 	            this.confirmationRepo.save(existingConfimation); // updates it for the existing user
@@ -99,7 +102,7 @@ public class UserService {
 		user.setPassword(this.encoder.encode(dto.getPassword()));
 		user.setEmail(dto.getEmail().toLowerCase().trim());
 		// get the role to save the user with the default role
-		Role role = this.roleRepo.findByRole("USER").orElseThrow(()-> new RuntimeException("Role Not found"));
+		Role role = this.roleRepo.findByRole("USER").orElseThrow(()-> new ResourceNotFoundException("Role Not found"));
 		user.getRoles().add(role);
 		role.getUsers().add(user);
 		this.userRepo.save(user);
@@ -158,10 +161,10 @@ public class UserService {
 	
 	public String userLoginVerification(UserLoginDTO userLoginDTO) {
 		
-		Users user = this.userRepo.findUserByEmail(userLoginDTO.getEmail().trim().toLowerCase()).orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+		Users user = this.userRepo.findUserByEmail(userLoginDTO.getEmail().trim().toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 		
 		if(!user.isVerified()) {
-			throw new RuntimeException("User is not verified. " + user.getFullName() + ", please verify you account before proceeding");
+			throw new ResourceConflictException("User is not verified. " + user.getFullName() + ", please verify you account before proceeding, you can verify either by clicking verification link sent to your eamil or by registering again");
 		}
 		
 		Authentication authentication = this.authManger.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail().trim().toLowerCase(), userLoginDTO.getPassword())); 
@@ -172,21 +175,21 @@ public class UserService {
 		}
 		
 		// else throw the exception !
-		throw new RuntimeException("Login Failed!");
+		throw new RuntimeException("Login Failed for some unkown reason!");
 	}
 	
 	public Users findUserByEmail(String email) {
 		// later move the exception in the global exception handling
-		return this.userRepo.findUserByEmail(email.trim().toLowerCase()).orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
+		return this.userRepo.findUserByEmail(email.trim().toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("User with email: " + email + " not found"));
 	}
 	
 	// forgot  password logic comes here
 	public void resetPassword(String email) {
 		//  generate the token, save it to dB and send the request
-		Users user = this.userRepo.findUserByEmail(email.trim().toLowerCase()).orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
+		Users user = this.userRepo.findUserByEmail(email.trim().toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("User with email: " + email + " not found"));
 		
 		if(!user.isVerified()) {
-			throw new RuntimeException("User need to verify first");
+			throw new ResourceConflictException("User need to verify first");
 		}
 		
 		Confirmation existsingConfirmation = confirmationRepo.findByUser(user).orElse(null);
@@ -223,7 +226,7 @@ public class UserService {
 		// 60 minutes of password expiry
 		
 		if(!isValid) {
-			throw new RuntimeException("Password reset Timeout, please send the password reset req again");
+			throw new TokenRelatedException("Password reset Timeout, please send the password reset req again");
 		}
 		
 		// if valid

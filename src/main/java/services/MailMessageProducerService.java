@@ -9,6 +9,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import configs.RabbitMQConfig;
+import exceptions.EmailServiceRelatedErrors;
 import model.MailMessage;
 
 @Service
@@ -40,7 +41,7 @@ public class MailMessageProducerService {
 			return message.getId();
 		} catch (Exception e) {
 			logger.error("Failed to send the email: {}", e.getMessage());
-			throw new RuntimeException("Failed to send the verification email");
+			throw new EmailServiceRelatedErrors("Failed to send the verification email");
 		}
 	}
 	
@@ -59,7 +60,7 @@ public class MailMessageProducerService {
 			this.rabbitTemplate.convertAndSend(RabbitMQConfig.APP_EXCHANGE, RabbitMQConfig.EMAIL_PASSWORD_RESET_ROUTING_KEY, message);
 			logger.info("Password reset req sent to the Queue ");
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to send the request for password reset");
+			throw new EmailServiceRelatedErrors("Failed to send the request for password reset");
 		}
 	}
 	

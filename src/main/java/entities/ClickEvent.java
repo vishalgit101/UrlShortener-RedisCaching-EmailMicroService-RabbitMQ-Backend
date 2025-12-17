@@ -23,6 +23,9 @@ public class ClickEvent {
 	@Column(name = "click_date")
 	private LocalDateTime clickDate;
 	
+	@Column(name = "user_ip")
+	private Long user_ip;
+	
 	@ManyToOne
 	@JoinColumn(name = "url_mapping_id")
 	private UrlMapping urlMapping;
@@ -45,6 +48,16 @@ public class ClickEvent {
 
 	public void setClickDate(LocalDateTime clickDate) {
 		this.clickDate = clickDate;
+	}
+	
+	
+
+	public Long getUser_ip() {
+		return user_ip;
+	}
+
+	public void setUser_ip(Long user_ip) {
+		this.user_ip = user_ip;
 	}
 
 	public UrlMapping getUrlMapping() {
