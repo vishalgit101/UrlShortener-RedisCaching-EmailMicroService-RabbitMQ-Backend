@@ -3,6 +3,10 @@ package entities;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,9 +39,10 @@ public class UrlMapping {
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
+	@JsonIgnore
 	private Users user;
 	
-	@OneToMany(mappedBy = "urlMapping")
+	@OneToMany(mappedBy = "urlMapping", cascade = CascadeType.ALL)
 	private List<ClickEvent> clickEvents = new ArrayList<>();
 	
 	public UrlMapping() {

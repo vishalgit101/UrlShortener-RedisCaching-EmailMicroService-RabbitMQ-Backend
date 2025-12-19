@@ -23,4 +23,7 @@ public interface UrlMappingRepo extends JpaRepository<UrlMapping, Long> {
 	@Modifying
 	@Query("UPDATE UrlMapping u SET u.clickCount = u.clickCount + 1 WHERE u.shortUrl = :shortUrl")
 	void incrementClick(@Param("shortUrl") String shortUrl);
+	
+	Page<UrlMapping> findUrlMappingsByUser(Users user, Pageable pageable);
+	
 }

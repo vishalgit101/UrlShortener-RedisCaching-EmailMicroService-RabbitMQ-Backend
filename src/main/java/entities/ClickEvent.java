@@ -2,6 +2,8 @@ package entities;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,10 +26,20 @@ public class ClickEvent {
 	private LocalDateTime clickDate;
 	
 	@Column(name = "user_ip")
-	private Long user_ip;
+	private String userIp;
+	
+	@Column(name = "user_agent")
+	private String userAgent;
+	
+	@Column(name = "accept_language")
+	private String acceptLanguage;
+	
+	@Column(name = "endpoint")
+	private String endpoint;
 	
 	@ManyToOne
 	@JoinColumn(name = "url_mapping_id")
+	@JsonIgnore
 	private UrlMapping urlMapping;
 	
 	public ClickEvent() {
@@ -50,14 +62,36 @@ public class ClickEvent {
 		this.clickDate = clickDate;
 	}
 	
-	
-
-	public Long getUser_ip() {
-		return user_ip;
+	public String getUserIp() {
+		return userIp;
 	}
 
-	public void setUser_ip(Long user_ip) {
-		this.user_ip = user_ip;
+	public void setUserIp(String userIp) {
+		this.userIp = userIp;
+	}
+
+	public String getUserAgent() {
+		return userAgent;
+	}
+
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
+	}
+
+	public String getAcceptLanguage() {
+		return acceptLanguage;
+	}
+
+	public void setAcceptLanguage(String acceptLanguage) {
+		this.acceptLanguage = acceptLanguage;
+	}
+
+	public String getEndpoint() {
+		return endpoint;
+	}
+
+	public void setEndpoint(String endpoint) {
+		this.endpoint = endpoint;
 	}
 
 	public UrlMapping getUrlMapping() {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import entities.UrlMapping;
 import entities.Users;
+import jakarta.servlet.http.HttpServletRequest;
 import model.UserPrincipal;
 import services.QrService;
 import services.UrlCachingService;
@@ -37,10 +38,17 @@ public class RedirectController {
 	}
 	
 	@GetMapping("/{shortUrl}")
-	public ResponseEntity<?> redirect(@PathVariable String shortUrl){
+	public ResponseEntity<?> redirect(@PathVariable String shortUrl, HttpServletRequest request){
+		//HttpServletRequest request is thread bound and after controller returns this request object might become unavailable for the Async functions/methods that's a problem
+
 		String cachedOriginal =  this.urlCachingService.getOriginal(shortUrl);
 		
-		this.urlMappingService.recordClickEvent(shortUrl);
+		String clientIp = extractClientIp(request);
+		String userAgent = request.getHeader("User-Agent");
+		String language = request.getHeader("Accept-Language");
+		String endpoint = request.getRequestURI();
+		
+		this.urlMappingService.recordClickEvent(shortUrl,clientIp, userAgent, language, endpoint); // Async function inside the service
 		
 		if(cachedOriginal != null) {
 			HttpHeaders httpHeaders = new HttpHeaders();
@@ -51,6 +59,19 @@ public class RedirectController {
 		}
 	}
 	
+	// helper method to extract clientIP
+	public String extractClientIp(HttpServletRequest request) {
+		String xff = request.getHeader("X-Forwarded-For"); // contains the ip list that a rerquest may passed with differnt proxies on the server
+		
+		if(xff != null && !xff.isEmpty()) {
+			return xff.split(",")[0].trim(); // first one is the client's ip
+		}
+		
+		return request.getRemoteAddr();
+	}
+	
+	
+	// for generating the qr code for a specific url that's already in the dB
 	@GetMapping("/qr/{shortUrl}")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> getQr(@PathVariable String shortUrl, @AuthenticationPrincipal UserPrincipal principal ){
@@ -58,7 +79,7 @@ public class RedirectController {
 			
 			UrlMapping urlMapping = this.urlMappingService.findByShortUrl(shortUrl);
 			if(urlMapping == null) {
-				return ResponseEntity.status(404).body("No Such Short Url Exists");
+				return ResponseEntity.status(404).body("No Such Short Url Exists in the dB");
 			}
 			
 			Users user = this.userService.findUserByEmail(principal.getUsername());

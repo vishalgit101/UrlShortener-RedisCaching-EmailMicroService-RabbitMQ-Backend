@@ -17,12 +17,14 @@ public class UrlMappingDto {
 
 	private String username; // useremail
 	
+	private String acessUrl;
+	
 	public UrlMappingDto() {
 		// TODO Auto-generated constructor stub
 	}
 
 	public UrlMappingDto(Long id, int clickCount, String originalUrl, String shortUrl, LocalDateTime createDate,
-			String username) {
+			String username, String acessUrl) {
 		super();
 		this.id = id;
 		this.clickCount = clickCount;
@@ -30,7 +32,9 @@ public class UrlMappingDto {
 		this.shortUrl = shortUrl;
 		this.createDate = createDate;
 		this.username = username;
+		this.acessUrl = acessUrl;
 	}
+	
 
 	public Long getId() {
 		return id;
@@ -79,6 +83,13 @@ public class UrlMappingDto {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
+
+	public String getAcessUrl() {
+		return acessUrl;
+	}
+
+	public void setAcessUrl(String acessUrl) {
+		this.acessUrl = acessUrl;
+	}
 	
 }

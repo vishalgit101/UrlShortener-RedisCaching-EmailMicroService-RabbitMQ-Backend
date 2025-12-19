@@ -3,6 +3,8 @@ package configs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -21,6 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import filters.JwtFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import services.MyUserDetailService;
 
 @Configuration
@@ -46,6 +49,7 @@ public class SecurityConfigs {
 		http.authorizeHttpRequests(request -> 
 			request.requestMatchers("/api/auth/public/**").permitAll()
 			.requestMatchers("/{shortUrl}").permitAll()
+			.requestMatchers("/api/admin").hasRole("ADMIN")
 			.anyRequest().authenticated());
 		
 		//http.formLogin(Customizer.withDefaults());
@@ -55,6 +59,30 @@ public class SecurityConfigs {
 		
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 		// add jwt filter here before the userpassword filter
+		
+		http.exceptionHandling(exception -> exception
+
+			    // 401 → not authenticated (missing / invalid JWT)
+			    .authenticationEntryPoint((request, response, authException) -> {
+			        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			        response.setContentType("application/json");
+			        response.getWriter().write(
+			            "{\"error\": \"Unauthorized\"}"
+			        );
+			    })
+
+			    // 403 → authenticated but role/authority mismatch
+			    .accessDeniedHandler((request, response, accessDeniedException) -> {
+			        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			        response.setContentType("application/json");
+			        response.getWriter().write(
+			            "{\"error\": \"Access denied: insufficient permissions\"}"
+			        );
+			    })
+			);
+
+
+
 		
 		return http.build();
 	}
@@ -92,5 +120,18 @@ public class SecurityConfigs {
 	public AuthenticationManager authManger(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
 	}
+	
+	
+  /*@Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.fromHierarchy("""
+            ROLE_ADMIN > ROLE_MANAGER
+            ROLE_MANAGER > ROLE_USER
+        """);
+    }*/
+	
+	// The Above Snippit defines the role hiearchy in SPring Security, with that we could avoid assigning mutiple related
+	// roles in dB that implies the hiearchy and thus update authority could be very simplified
+	// will refactor later for now we keep the default flow to quickly finish the project
 	
 }

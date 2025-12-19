@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -47,7 +49,7 @@ public class Users {
 			)
 	private Set<Role> roles = new HashSet<>();
 	
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<UrlMapping> urlMappings = new ArrayList<>();
 	
 	
@@ -58,6 +60,8 @@ public class Users {
 	public Long getId() {
 		return id;
 	}
+	
+	
 
 	public void setId(Long id) {
 		this.id = id;
@@ -109,6 +113,18 @@ public class Users {
 
 	public void setVerified(boolean verified) {
 		this.verified = verified;
+	}
+	
+	public void addRole(Role role) {
+		this.roles.add(role);
+		role.getUsers().add(this);
+	}
+	
+	public void clearRoles() {
+	    for (Role role : this.roles) {
+	        role.getUsers().remove(this);
+	    }
+	    this.roles.clear();
 	}
 	
 }

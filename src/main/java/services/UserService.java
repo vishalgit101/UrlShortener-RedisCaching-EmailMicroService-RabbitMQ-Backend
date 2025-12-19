@@ -1,17 +1,28 @@
 package services;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import dtos.PasswordResetRequestDto;
+import dtos.UserDto;
 import dtos.UserLoginDTO;
 import dtos.UserRegisterDTO;
 import entities.Confirmation;
@@ -26,6 +37,7 @@ import repos.RoleRepo;
 import repos.UserRepo;
 
 @Service
+@Transactional
 public class UserService {
 	private final UserRepo userRepo;
 	private final RoleRepo roleRepo;
@@ -239,4 +251,89 @@ public class UserService {
 		return true;
 	}
 	
+	public UserDto getUserDto(Users user) {
+		UserDto userDto = new UserDto();
+		
+		userDto.setEmail(user.getEmail());
+		userDto.setFullName(user.getFullName());
+		userDto.setId(user.getId());
+		userDto.setVerified(user.isVerified());
+		
+		Set<String> userDtoRoles = new HashSet<>();
+		
+		for(Role role: user.getRoles()) {
+			userDtoRoles.add(role.getRole());
+		}
+		
+		userDto.setRoles(userDtoRoles);
+		
+		return userDto;
+	}
+	
+	public Users getUserById(Long userID) {
+		 return this.userRepo.findById(userID).orElseThrow(() -> new ResourceNotFoundException("User with userId: " + userID + ", not found")); 
+	}
+	
+	public Page<UserDto> getAllUsers(int page, int size){ // page= page number and size= number of entities in single batch
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		
+		Page<Users> users =  this.userRepo.findAll(pageable);
+		
+		List<UserDto> userDtos = new ArrayList<>();
+		
+		for(Users user: users.getContent()) {
+			userDtos.add(getUserDto(user));
+		}
+		
+		Page<UserDto> userDtoPage = new PageImpl<UserDto>(userDtos, pageable, users.getTotalElements());
+			
+		return userDtoPage;
+	}
+
+
+	// this could all be simplified to use the Spring Security Role Hierachy and User could having single direct role 
+	// or multiple unrelated roles that are not part of the hiearchy
+	public void updateRole(Long userId, String roleName) {
+
+	    Users user = userRepo.findById(userId)
+	        .orElseThrow(() -> new ResourceNotFoundException("User with userId: " + userId +  ", not found"));
+
+	    user.clearRoles();
+
+	    Set<String> roleNames;
+	    
+	    switch (roleName.toUpperCase()) {
+
+        case "MANAGER":
+        	roleNames = Set.of("USER", "MANAGER");
+            break;
+
+        case "ADMIN":
+        	roleNames = Set.of("USER", "MANAGER", "ADMIN");
+            break;
+       
+        default: 
+        	roleNames = Set.of("USER");
+        	break;
+    }
+
+	    Set<Role> roles = roleRepo.findByRoleIn(roleNames);
+	    
+	    if (roles.size() != roleNames.size()) {
+	        throw new ResourceNotFoundException("One or more specified roles could not be found in the database.");
+	    }
+	    
+	    for(Role role: roles) {
+	    	user.addRole(role);
+	    }
+	    
+	    this.userRepo.save(user);
+	}
+
+	public void deleteUser(Long userId) {
+		//this.userRepo.deleteById(userId); problem with this is, it doesn't tell if the user exited
+		Users user = this.userRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User with userId: " + userId + ", not existed"));
+		this.userRepo.delete(user);
+		
+	}
 }

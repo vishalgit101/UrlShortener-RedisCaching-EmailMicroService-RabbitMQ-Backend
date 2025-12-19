@@ -11,6 +11,7 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -27,8 +28,10 @@ import entities.ClickEvent;
 import entities.UrlMapping;
 import entities.Users;
 import exceptions.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import repos.ClickEventRepo;
 import repos.UrlMappingRepo;
+import repos.UserRepo;
 
 @Service
 public class UrlMappingService {
@@ -37,6 +40,10 @@ public class UrlMappingService {
 	private final UrlMappingRepo urlMappingRepo;
 	private final ClickEventRepo clickEventRepo;
 	private final UrlCachingService urlCachingService;
+	private UserRepo userRepo;
+	
+	@Value("${base.url}")
+	private String acessUrl;
 	
 	private Logger logger = LoggerFactory.getLogger(UrlMappingService.class);
 	
@@ -46,12 +53,13 @@ public class UrlMappingService {
 	private static final int SHORT_LENGTH = 6;
 	
 	public UrlMappingService(UserService userService, UrlMappingRepo urlMappingRepo, ClickEventRepo clickEventRepo, 
-			UrlCachingService urlCachingService) {
+			UrlCachingService urlCachingService, UserRepo userRepo) {
 		super();
 		this.userService = userService;
 		this.urlMappingRepo = urlMappingRepo;
 		this.clickEventRepo = clickEventRepo;
 		this.urlCachingService = urlCachingService;
+		this.userRepo = userRepo;
 	}
 	
 	public UrlMapping findByShortUrl(String shortUrl) {
@@ -94,7 +102,7 @@ public class UrlMappingService {
 		urlMappingDto.setOriginalUrl(savedUrlMapping.getOriginalUrl());
 		urlMappingDto.setShortUrl(savedUrlMapping.getShortUrl());
 		urlMappingDto.setUsername(savedUrlMapping.getUser().getEmail());
-		
+		urlMappingDto.setAcessUrl(this.acessUrl + "/" + savedUrlMapping.getShortUrl());
 		return urlMappingDto;
 		
 	}
@@ -223,12 +231,15 @@ public class UrlMappingService {
 	// get the UrlMapping, record the click and ClickEvent and return the urlMapping
 	@Async
 	@Transactional
-	public void recordClickEvent(String shortUrl) {
+	public void recordClickEvent(String shortUrl, String clientIp, String userAgent, String language, String endpoint) { 
+		//HttpServletRequest request is thread bound and after controller returns this request object might become unavailable for the Async functions/methods that's a problem
 		
 		UrlMapping urlMapping = this.urlMappingRepo.findByShortUrl(shortUrl);
 		
 		//this.urlMappingRepo.incrementClick(shortUrl); uncomment it to handle race conditions when app grows, for now its fine
 		
+		
+		// can also move this whole click event handling and saving to dB to the message broker as well, perhaps we'll do this later
 		if(urlMapping != null) {
 			urlMapping.setClickCount(urlMapping.getClickCount() +1); //put/replace this with the commented code above to deal with the race condition, with atomic increment
 			urlMappingRepo.save(urlMapping);
@@ -237,12 +248,49 @@ public class UrlMappingService {
 			ClickEvent clickEvent = new ClickEvent();
 			clickEvent.setClickDate(LocalDateTime.now());
 			clickEvent.setUrlMapping(urlMapping);
+			clickEvent.setUserIp(clientIp);
+			clickEvent.setUserAgent(userAgent);
+			clickEvent.setAcceptLanguage(language);
+			clickEvent.setEndpoint(endpoint);
 			clickEventRepo.save(clickEvent);
 		}else {
-			throw new ResourceNotFoundException("No such short url exists in the database");
+			//throw new ResourceNotFoundException("No such short url exists in the database"); should'nt throw exception inside async method
+			logger.info("Invalid shortUrl hit: {}", shortUrl);
 		}
 	}
-	
-	
-	
+
+	public void deleteUrl(UrlMapping urlMapping) {
+		urlCachingService.deleteUrlCaching(urlMapping.getShortUrl());
+		//clickEventRepo.deleteByUrlMapping(urlMapping); do this when there is no cascade on the ClickEvnets
+		urlMappingRepo.delete(urlMapping);
+	}
+
+	public Page<UrlMappingDto> getUrlMappingsByUser(Long userId, int page, int size) {
+		Users user = this.userRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User with userId: " + userId + ", not found"));
+		
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createDate"));
+
+		Page<UrlMapping> urlMappings =  this.urlMappingRepo.findUrlMappingsByUser(user, pageable);
+		
+		List<UrlMappingDto> urlMappingDtos = new ArrayList<UrlMappingDto>();
+		
+		for(UrlMapping urlObj : urlMappings.getContent()) {
+			urlMappingDtos.add(convertToDto(urlObj));
+		}
+		
+		Page<UrlMappingDto> dtoPage = new PageImpl<UrlMappingDto>(urlMappingDtos, pageable, urlMappings.getTotalElements());
+		
+		return dtoPage;
+		
+	}
+
+	public Page<ClickEvent> getClickEventsByUrlId(Long urlId, int page, int size) {
+		UrlMapping urlMapping =  this.urlMappingRepo.findById(urlId).orElseThrow(()-> new ResourceNotFoundException("No url-mapping for urlId: " + urlId + ", exits"));
+		
+		Pageable pageable = PageRequest.of(page, size, Sort.by("clickDate").descending());
+		
+		Page<ClickEvent> clickEvents =  this.clickEventRepo.findClickEventsByUrlMapping(urlMapping, pageable);
+		
+		return clickEvents;
+	}
 }

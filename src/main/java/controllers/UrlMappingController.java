@@ -7,12 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dtos.ClickEventDto;
 import dtos.UrlMappingDto;
+import entities.UrlMapping;
 import entities.Users;
 import model.UserPrincipal;
 import services.UrlMappingService;
@@ -68,7 +67,19 @@ public class UrlMappingController {
 	@GetMapping("/analytics/{shortUrl}") // PathVariable
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> getUrlAnalytics(@PathVariable String shortUrl, 
-			@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate){
+			@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate, @AuthenticationPrincipal UserPrincipal principal){
+		
+		Users user = this.userService.findUserByEmail(principal.getUsername());
+		
+		UrlMapping urlMapping = this.urlMappingService.findByShortUrl(shortUrl);
+		
+		if(urlMapping == null) {
+			return ResponseEntity.status(404).body("No Such Short Url Exists in the dB");
+		}
+		
+		if(!user.getId().equals(urlMapping.getUser().getId())) {
+			return ResponseEntity.status(403).body("This shortUrl doesnt belong to you");
+		}
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 		LocalDateTime start = LocalDateTime.parse(startDate, formatter);
@@ -91,4 +102,24 @@ public class UrlMappingController {
 		return ResponseEntity.ok().body(totalClicks);
 	}
 	
+	// Delete Mapping
+	@DeleteMapping("/delete/{shortUrl}")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<?> deleteMapping(@PathVariable String shortUrl, @AuthenticationPrincipal UserPrincipal principal){
+		Users user = this.userService.findUserByEmail(principal.getUsername());
+		
+		UrlMapping urlMapping = this.urlMappingService.findByShortUrl(shortUrl);
+		
+		if(urlMapping == null) {
+			return ResponseEntity.status(404).body("No Such Short Url Exists in the dB");
+		}
+		
+		if(!user.getId().equals(urlMapping.getUser().getId())) {
+			return ResponseEntity.status(403).body("This shortUrl doesnt belong to you");
+		}
+		
+		this.urlMappingService.deleteUrl(urlMapping);
+		
+		return ResponseEntity.ok().body("All Data Related to " + shortUrl + ", Deleted Sucessfully");
+	}
 }
