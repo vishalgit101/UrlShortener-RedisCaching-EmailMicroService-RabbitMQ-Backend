@@ -48,6 +48,10 @@ public class SecurityConfigs {
 		
 		http.authorizeHttpRequests(request -> 
 			request.requestMatchers("/api/auth/public/**").permitAll()
+			.requestMatchers( "/swagger-ui/**",
+		            "/v3/api-docs/**",
+		            "/swagger-ui.html").permitAll()
+			
 			.requestMatchers("/{shortUrl}").permitAll()
 			.requestMatchers("/api/admin").hasRole("ADMIN")
 			.anyRequest().authenticated());

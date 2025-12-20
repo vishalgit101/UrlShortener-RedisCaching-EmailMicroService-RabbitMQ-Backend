@@ -293,4 +293,8 @@ public class UrlMappingService {
 		
 		return clickEvents;
 	}
+	
+	public UrlMapping getUrlMappingByUrlId(Long urlId) {
+		return this.urlMappingRepo.findById(urlId).orElseThrow(()-> new ResourceNotFoundException("No url-mapping for urlId: " + urlId + ", exits"));
+	}
 }
