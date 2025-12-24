@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import entities.UrlMapping;
 import entities.Users;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import model.UserPrincipal;
 import services.QrService;
@@ -20,6 +23,10 @@ import services.UrlMappingService;
 import services.UserService;
 
 @RestController
+@Tag(
+	    name = "05 - Redirect & QR",
+	    description = "Browser redirection and QR code generation for shortened URLs"
+	)
 public class RedirectController {
 	// DI and Class fields
 	private final UrlMappingService urlMappingService;
@@ -38,6 +45,7 @@ public class RedirectController {
 	}
 	
 	@GetMapping("/{shortUrl}")
+	@Hidden
 	public ResponseEntity<?> redirect(@PathVariable String shortUrl, HttpServletRequest request){
 		//HttpServletRequest request is thread bound and after controller returns this request object might become unavailable for the Async functions/methods that's a problem
 
@@ -74,6 +82,21 @@ public class RedirectController {
 	// for generating the qr code for a specific url that's already in the dB
 	@GetMapping("/qr/{shortUrl}")
 	@PreAuthorize("hasRole('USER')")
+	@Operation(
+	        summary = "Generate QR Code for Short URL",
+	        description = """
+	            Generates a QR code image for an existing short URL.
+	            Only the owner of the URL can generate its QR code.
+	            
+	            The QR code points to the public redirect URL.
+	            
+	            Example GET request:
+	            http://localhost:8080/qr/Es5hGE
+	            
+	            Response:
+	            PNG image (300x300)
+	            """
+	    )
 	public ResponseEntity<?> getQr(@PathVariable String shortUrl, @AuthenticationPrincipal UserPrincipal principal ){
 		try {
 			

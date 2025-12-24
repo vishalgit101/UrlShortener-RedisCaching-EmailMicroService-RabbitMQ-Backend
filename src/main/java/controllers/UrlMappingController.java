@@ -20,15 +20,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import dtos.ClickEventDto;
+import dtos.UrlDto;
 import dtos.UrlMappingDto;
 import entities.UrlMapping;
 import entities.Users;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import model.UserPrincipal;
 import services.UrlMappingService;
 import services.UserService;
 
 @RestController
 @RequestMapping("/api/urls")
+@Tag(
+		name = "02 - URL Management", 
+		description = "APIs to create, fetch, analyze, and delete shortened URLs"
+)
 public class UrlMappingController {
 	private UrlMappingService urlMappingService;
 	private UserService userService;
@@ -43,8 +50,12 @@ public class UrlMappingController {
 	
 	@PostMapping("/shorten")
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<?> createShortUrl(@RequestBody Map<String, String> request,@AuthenticationPrincipal UserPrincipal principal) {
-		String originalUrl = request.get("originalUrl");
+    @Operation(
+            summary = "Create Short URL",
+            description = "Creates a shortened URL for the given original URL and stores in the redis cache. User must be authenticated."
+        )
+	public ResponseEntity<?> createShortUrl(@RequestBody UrlDto request, @AuthenticationPrincipal UserPrincipal principal) {
+		String originalUrl = request.getOriginalUrl();
 		Users user = this.userService.findUserByEmail(principal.getUsername());
 		UrlMappingDto urlMappingDto = this.urlMappingService.createShortUrl(originalUrl, user);
 		return ResponseEntity.ok().body(urlMappingDto);
@@ -54,6 +65,12 @@ public class UrlMappingController {
 	
 	@GetMapping("/myUrls")
 	@PreAuthorize("hasRole('USER')")
+	@Operation(
+		        summary = "Fetch User URLs",
+		        description = "Fetches all shortened URLs created by the authenticated user.\n" +
+		                      "Example GET request:\n" +
+		                      "http://localhost:8080/api/urls/myUrls?page=0"
+		    )
 	public ResponseEntity<?> fetchAllUrlByUser(@AuthenticationPrincipal UserPrincipal principal, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size){
 		Users user = this.userService.findUserByEmail(principal.getUsername());
@@ -66,6 +83,12 @@ public class UrlMappingController {
 	
 	@GetMapping("/analytics/{shortUrl}") // PathVariable
 	@PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Get URL Analytics",
+            description = "Fetches click events for a specific short URL in a date-time range.\n" +
+                          "Example GET request:\n" +
+                          "http://localhost:8080/api/urls/analytics/Es5hGE?startDate=2024-12-01T00:00:00&endDate=2026-12-07T23:59:59"
+        )
 	public ResponseEntity<?> getUrlAnalytics(@PathVariable String shortUrl, 
 			@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate, @AuthenticationPrincipal UserPrincipal principal){
 		
@@ -90,6 +113,12 @@ public class UrlMappingController {
 	
 	@GetMapping("/totalClicks")
 	@PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Get Total Clicks",
+            description = "Returns total clicks per day for the authenticated user in a date range.\n" +
+                          "Example GET request:\n" +
+                          "http://localhost:8080/api/urls/totalClicks?startDate=2024-12-01&endDate=2026-12-07"
+        )
 	public ResponseEntity<?> getTotalClicksByDate(@AuthenticationPrincipal UserPrincipal principal, 
 			@RequestParam("startDate") String startDate,
 			@RequestParam("endDate") String endDate
@@ -105,6 +134,12 @@ public class UrlMappingController {
 	// Delete Mapping
 	@DeleteMapping("/delete/{shortUrl}")
 	@PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Delete Short URL",
+            description = "Deletes the short URL and all associated click data for the authenticated user.\n" +
+                          "Example DELETE request:\n" +
+                          "http://localhost:8080/api/urls/delete/Es5hGE"
+        )
 	public ResponseEntity<?> deleteMapping(@PathVariable String shortUrl, @AuthenticationPrincipal UserPrincipal principal){
 		Users user = this.userService.findUserByEmail(principal.getUsername());
 		

@@ -13,12 +13,18 @@ import dtos.UserDto;
 import entities.ClickEvent;
 import entities.UrlMapping;
 import entities.Users;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import model.UserPrincipal;
 import services.UrlMappingService;
 import services.UserService;
 
 @RestController
 @RequestMapping("/api/auth/user")
+@Tag(
+	name = "03 - User",
+	description = "APIs related to authenticated user profile and activity"
+		)
 public class UserController {
 	private final UserService userService;
 	private final UrlMappingService urlMappingService;
@@ -31,6 +37,15 @@ public class UserController {
 	
 	@GetMapping
 	@PreAuthorize("hasRole('USER')")
+	@Operation(
+	        summary = "Get Logged-in User Details",
+	        description = """
+	            Returns profile information of the currently authenticated user.
+	            
+	            Example GET request:
+	            http://localhost:8080/api/auth/user
+	            """
+	    )
 	public ResponseEntity<?> getUser(@AuthenticationPrincipal UserPrincipal principal){
 		Users user = this.userService.findUserByEmail(principal.getUsername());
 		UserDto userDto = this.userService.getUserDto(user);
@@ -38,6 +53,16 @@ public class UserController {
 		return ResponseEntity.ok().body(userDto);
 	}
 	
+
+	@Operation(
+	        summary = "Get Click Events for a URL",
+	        description = """
+	            Fetches paginated click events for a specific URL owned by the authenticated user.
+	            
+	            Example GET request:
+	            http://localhost:8080/api/auth/user/url/click-events?urlId=12&page=0&size=5
+	            """
+	    )
 	@GetMapping("/url/click-events")
 	public ResponseEntity<?> getClickEventsByUrlId(@RequestParam Long urlId, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @AuthenticationPrincipal UserPrincipal principal){

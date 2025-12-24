@@ -19,6 +19,8 @@ import dtos.PasswordResetRequestDto;
 import dtos.UserLoginDTO;
 import dtos.UserRegisterDTO;
 import entities.Users;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import model.HttpResponse;
 import model.UserPrincipal;
@@ -26,6 +28,11 @@ import services.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(
+	    name = "01 - Authentication & Authorization",
+	    description = "Handles user registration, email verification, login, and password reset operations"
+	)
+
 public class AuthController {
 	// DI and class fields
 	private final UserService userService;
@@ -42,7 +49,16 @@ public class AuthController {
 		System.out.println("hit");
 		return "Hello";
 	}
+	
+	@GetMapping("/public/health")
+	public String health() {
+		return "Running";
+	}
 
+	@Operation(
+		    summary = "01 Register a new user",
+		    description = "Creates a new user account and sends an email verification link via asynchronous email service"
+		)
 	@PostMapping("/public/register")
 	public ResponseEntity<HttpResponse> register(@RequestBody UserRegisterDTO dto, HttpServletRequest request) {
 		System.out.println("Hit");
@@ -62,6 +78,10 @@ public class AuthController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
+	@Operation(
+		    summary = "03 Authenticate user",
+		    description = "Validates user credentials and returns a JWT token upon successful authentication"
+		)
 	@PostMapping("/public/login")
 	public ResponseEntity<HttpResponse> login(@RequestBody UserLoginDTO userlogin, HttpServletRequest request) {
 		String jwtToken = this.userService.userLoginVerification(userlogin);
@@ -79,6 +99,11 @@ public class AuthController {
 		return ResponseEntity.ok().body(response);
 	}
 	
+	@Operation(
+			//operationId = "02_verifyUser",
+		    summary = "02 Verify user account",
+		    description = "Verifies user account using the email confirmation token"
+		)
 	@GetMapping("/public/verify")
 	public ResponseEntity<HttpResponse> verifyUser(@RequestParam String token, HttpServletRequest request){
 		
@@ -109,6 +134,10 @@ public class AuthController {
 	}
 	
 	
+	@Operation(
+		    summary = "04 Request password reset",
+		    description = "Sends a password reset link to the registered email address"
+		)
 	@PostMapping("/public/reset-password")
 	public ResponseEntity<?> resetPassword(@RequestParam("email")  String email) {
 		this.userService.resetPassword(email);
@@ -116,6 +145,10 @@ public class AuthController {
 		return ResponseEntity.ok().body("Please check your email for password reset link");
 	}
 	
+	@Operation(
+		    summary = "05 Reset password",
+		    description = "Resets the user password using a valid password reset token, COPY the TOKEN FROM your EMAIL"
+		)
 	@PutMapping("/public/reset-password")
 	public ResponseEntity<?> updatePassword(@RequestBody PasswordResetRequestDto passwordReset){
 		if(!passwordReset.getNewPassword().equals(passwordReset.getConfirmPassword())) {
