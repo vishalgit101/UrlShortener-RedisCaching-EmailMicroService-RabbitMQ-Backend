@@ -1,0 +1,749 @@
+{
+	"info": {
+		"_postman_id": "44951635-4907-4783-b398-cf2b2ac4904c",
+		"name": "UrlShortener",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42339429"
+	},
+	"item": [
+		{
+			"name": "Health-test",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/auth/public/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"public",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RegisterRequest",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {   \r\n        \"fullName\": \"Sunny Zoldyck\",\r\n        \"password\": \"pass125\",\r\n        \"email\": \"vishalgit101@gmail.com\"\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/public/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"public",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LoginRequest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {   \r\n        \"email\": \"vishal@gmail.com\",\r\n        \"password\": \"pass123\"\r\n\r\n        /*\"email\": \"padishahemperor123@gmail.com\",\r\n        \"password\": \"Pass129\"*/\r\n\r\n        /*\"email\": \"vishalgit101@gmail.com\",\r\n        \"password\": \"pass125\"*/\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/public/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"public",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ShortenUrl",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxnaXQxMDFAZ21haWwuY29tIiwiaWF0IjoxNzY3NDMxMTAxLCJleHAiOjE3Njc0NDkxMDF9.c2sWuRzqHkN-9TPJG5oxf37hmsWq_XRYtIQMzPkGuJY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"originalUrl\":\"https://www.linkedin.com/in/vishal-choudhary-b9089a328/\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/urls/shorten",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"urls",
+						"shorten"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LoggedInUserDetails",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxnaXQxMDFAZ21haWwuY29tIiwiaWF0IjoxNzY3NDMxMTAxLCJleHAiOjE3Njc0NDkxMDF9.c2sWuRzqHkN-9TPJG5oxf37hmsWq_XRYtIQMzPkGuJY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/auth/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "testHello",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxnaXQxMDFAZ21haWwuY29tIiwiaWF0IjoxNzY2MTQxMzY0LCJleHAiOjE3NjYxNTkzNjR9.fd4JQW2hQXOgwskSpCq8F5u3sTjRcOV5HQZGN_V6yIQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/auth/test",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"test"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MyUrls",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxnaXQxMDFAZ21haWwuY29tIiwiaWF0IjoxNzY3NDMxMTAxLCJleHAiOjE3Njc0NDkxMDF9.c2sWuRzqHkN-9TPJG5oxf37hmsWq_XRYtIQMzPkGuJY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/urls/myUrls?page=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"urls",
+						"myUrls"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTotalClicks",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxnaXQxMDFAZ21haWwuY29tIiwiaWF0IjoxNzY3NDMxMTAxLCJleHAiOjE3Njc0NDkxMDF9.c2sWuRzqHkN-9TPJG5oxf37hmsWq_XRYtIQMzPkGuJY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/urls/totalClicks?startDate=2024-12-01&endDate=2026-12-07",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"urls",
+						"totalClicks"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2024-12-01"
+						},
+						{
+							"key": "endDate",
+							"value": "2026-12-07"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAnalytics",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxAZ21haWwuY29tIiwiaWF0IjoxNzY3NDI2MzY2LCJleHAiOjE3Njc0NDQzNjZ9.IXufNc-oOW9bmeW3lm4un9ZRJzzOEjbeXSX--mLx5ec",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/urls/analytics/YFvS9w?startDate=2024-12-01T00:00:00&endDate=2026-12-07T23:59:59",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"urls",
+						"analytics",
+						"YFvS9w"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2024-12-01T00:00:00"
+						},
+						{
+							"key": "endDate",
+							"value": "2026-12-07T23:59:59"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ClickEventByUrl-Id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxnaXQxMDFAZ21haWwuY29tIiwiaWF0IjoxNzY3NDMxMTAxLCJleHAiOjE3Njc0NDkxMDF9.c2sWuRzqHkN-9TPJG5oxf37hmsWq_XRYtIQMzPkGuJY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/auth/user/url/click-events?urlId=26",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"user",
+						"url",
+						"click-events"
+					],
+					"query": [
+						{
+							"key": "urlId",
+							"value": "26"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RedirectRequest",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxAZ21haWwuY29tIiwiaWF0IjoxNzY2MTMwODUyLCJleHAiOjE3NjYxNDg4NTJ9.C8fAHmLJxzzqRFzdZCjvQClO01keWAoegSPI6-BKJ9s",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/YFvS9w",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"YFvS9w"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateQr",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxnaXQxMDFAZ21haWwuY29tIiwiaWF0IjoxNzY3NDMxMTAxLCJleHAiOjE3Njc0NDkxMDF9.c2sWuRzqHkN-9TPJG5oxf37hmsWq_XRYtIQMzPkGuJY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/qr/W8EvQ1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"qr",
+						"W8EvQ1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteShortUrl-USER",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxAZ21haWwuY29tIiwiaWF0IjoxNzY2NjQxNjQ4LCJleHAiOjE3NjY2NTk2NDh9.0l439vkgJnZmtgLFWtJzM6n829SFqP5BgJ7qXYGbDTM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {   \r\n        /*\"email\": \"vishal@gmail.com\",\r\n        \"password\": \"pass123\"*/\r\n\r\n        /*\"email\": \"padishahemperor123@gmail.com\",\r\n        \"password\": \"pass122\"*/\r\n\r\n        \"email\": \"vishalgit101@gmail.com\",\r\n        \"password\": \"pass122\"\r\n    }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/urls/delete/84gVHc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"urls",
+						"delete",
+						"84gVHc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Password Reset",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {   \r\n        \"email\": \"vishal@gmail.com\",\r\n        \"password\": \"pass123\"\r\n    }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/public/reset-password?email=vishalgit101@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"public",
+						"reset-password"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "vishalgit101@gmail.com"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Password-Reset",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {   \r\n        \"token\": \"e283b1eb-7a14-45d6-8f4b-453bc2d79939\",\r\n        \"newPassword\": \"pass122\",\r\n        \"confirmPassword\": \"pass122\"\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/public/reset-password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"public",
+						"reset-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAllUsers-ADMIN/MANAGER",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxAZ21haWwuY29tIiwiaWF0IjoxNzY3NDMxNDA2LCJleHAiOjE3Njc0NDk0MDZ9.VwAQnrQ78IzZ3CRVAHAy9QLzEhA1x7vgPOZmeIFldHA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users/getusers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users",
+						"getusers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetUserByUserId-ADMIN/MANAGER",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxAZ21haWwuY29tIiwiaWF0IjoxNzY3NDI2MzY2LCJleHAiOjE3Njc0NDQzNjZ9.IXufNc-oOW9bmeW3lm4un9ZRJzzOEjbeXSX--mLx5ec",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users",
+						"10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ClickEventByUrlId-ADMIN/MANAGER",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxAZ21haWwuY29tIiwiaWF0IjoxNzY3NDI2MzY2LCJleHAiOjE3Njc0NDQzNjZ9.IXufNc-oOW9bmeW3lm4un9ZRJzzOEjbeXSX--mLx5ec",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users/click-events?urlId=6&page=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users",
+						"click-events"
+					],
+					"query": [
+						{
+							"key": "urlId",
+							"value": "6"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetUrlMappingsByUser-ADMIN/MANAGER",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxAZ21haWwuY29tIiwiaWF0IjoxNzY2NjQxNjQ4LCJleHAiOjE3NjY2NTk2NDh9.0l439vkgJnZmtgLFWtJzM6n829SFqP5BgJ7qXYGbDTM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users/url-mappings?userId=10&page=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users",
+						"url-mappings"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "10"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateRole-ADMIN",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxAZ21haWwuY29tIiwiaWF0IjoxNzY2NjQxNjQ4LCJleHAiOjE3NjY2NTk2NDh9.0l439vkgJnZmtgLFWtJzM6n829SFqP5BgJ7qXYGbDTM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users/update-role?userId=10&roleName=USER",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users",
+						"update-role"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "10"
+						},
+						{
+							"key": "roleName",
+							"value": "USER"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteUser&Mappings-ADMIN",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aXNoYWxAZ21haWwuY29tIiwiaWF0IjoxNzY3NDI2MzY2LCJleHAiOjE3Njc0NDQzNjZ9.IXufNc-oOW9bmeW3lm4un9ZRJzzOEjbeXSX--mLx5ec",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/users/delete/14",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"users",
+						"delete",
+						"14"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

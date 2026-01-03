@@ -17,33 +17,55 @@ import io.swagger.v3.oas.annotations.info.License;
 @EntityScan(basePackages = {"entities"})
 @EnableJpaRepositories(basePackages = {"repos"})
 @OpenAPIDefinition(
-		info = @Info(
-				title = "Url Shortner Microservice Project with Redis and RabbitMQ",
-				description = "A production-grade URL Shortener microservice built with Spring Boot, designed with scalability, security, and performance in mind.\n"
-						+ "\n"
-						+ "The system implements a complete user authentication and authorization flow using Spring Security and JWT, including email verification and secure password reset via an asynchronous, event-driven email queue powered by RabbitMQ.\n"
-						+ "\n"
-						+ "Redis is used for high-performance caching, rate limiting, and abuse prevention to efficiently handle high-traffic scenarios. The application follows a stateless, microservice-oriented architecture with clean separation of concerns.\n"
-						+ "\n"
-						+ "Additional features include QR code generation for shortened URLs, detailed request logging for security and analytics, and fully documented REST APIs using Swagger/OpenAPI for easy testing and integration.\n"
-						+ "\n"
-						+ "This project demonstrates real-world backend engineering practices such as asynchronous processing, secure authentication, distributed caching, and scalable system design.\n"
-						+ "",
-				version = "1.0.0",
-				contact = @Contact(
-						name = "Vishal",
-						email = "vishalgit101@gmail.com",
-						url = "Placeholder for Portfolio site"
-						),
-				license = @License(
-						name = "MIT License"
-						)
-				),
-		externalDocs = @ExternalDocumentation(
-			    description = "Additional Information: A pre-configured demo user with limited administrative privileges is available for evaluating secured APIs. This account allows testing of most protected features while restricting high-risk operations such as role upgrades and user deletion. Demo credentials are documented in the project repository README.",
-			    url = "Repo PLaceholder"
-				)
-		)
+	    info = @Info(
+	        title = "URL Shortener Microservice with Redis and RabbitMQ",
+	        description = """
+	            A **production-grade URL Shortener microservice** built with Spring Boot, designed with scalability, security, and performance in mind.
+
+	            ### Key Features
+	            - JWT-based authentication and authorization using Spring Security
+	            - Email verification and secure password reset via **RabbitMQ (event-driven)**
+	            - **Redis** for high-performance caching, rate limiting, and abuse prevention
+	            - Stateless, microservice-oriented architecture
+	            - QR code generation for shortened URLs
+	            - Detailed request logging for security and analytics
+	            - Fully documented REST APIs using **Swagger / OpenAPI**
+
+	            ### Demo Account
+	            A pre-configured demo user is available for evaluating secured APIs.
+
+	            **Credentials**
+	            - Username: `demo@gmail.com`
+	            - Password: `demo123`
+
+	            This account allows testing of most protected features while restricting
+	            high-risk operations such as role upgrades and user deletion.
+
+	            ### Deployment Notes
+	            > ⚠️ This application is hosted on **Render Free Tier**.
+	            > SMTP ports are blocked on the free tier, so:
+	            > - User registration email verification
+	            > - Password reset emails  
+	            > will **not work** in this environment.
+	            > All other APIs function correctly.
+	            """,
+	        version = "1.1.0",
+	        contact = @Contact(
+	            name = "Vishal",
+	            email = "vishalgit101@gmail.com",
+	            url = "https://github.com/vishalgit101"
+	        ),
+	        license = @License(
+	            name = "MIT License"
+	        )
+	    ),
+	    externalDocs = @ExternalDocumentation(
+	        description = "Project source code and additional documentation",
+	        url = "https://github.com/vishalgit101/UrlShortener-RedisCaching-EmailMicroService-RabbitMQ-Backend"
+	    )
+	)
+
+
 public class LinkShortenerApplication {
 
 	public static void main(String[] args) {
