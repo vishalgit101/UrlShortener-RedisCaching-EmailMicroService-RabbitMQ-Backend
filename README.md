@@ -3,7 +3,7 @@
 
 A high-performance, enterprise-grade **Spring Boot** application designed for scalable URL shortening. This project implements a Microservices architecture pattern, utilizing **Redis** for high-speed caching and rate limiting, **RabbitMQ** for asynchronous decoupling of the email service, and **Docker** for containerized deployment.
 
-The application is fully hosted on **Render** with a CI/CD pipeline integrated via GitHub Actions and Docker Hub.
+The application is fully hosted on **Render** with a CI/CD pipeline integrated via Docker Hub.
 
 ---
 
