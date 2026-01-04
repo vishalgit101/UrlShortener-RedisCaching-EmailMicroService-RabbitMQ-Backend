@@ -1,124 +1,112 @@
 
-  
-# 🚀 UrlShortener - Hosted Microservices Backend
+# 🚀 UrlShortener - Microservices Backend & Email System
 
-A scalable, enterprise-grade **Spring Boot** application designed to handle URL shortening with high throughput. This project leverages a Microservices architecture featuring **Redis** for caching, **RabbitMQ** for asynchronous messaging, and is fully containerized and hosted on **Render**.
+A high-performance, enterprise-grade **Spring Boot** application designed for scalable URL shortening. This project implements a Microservices architecture pattern, utilizing **Redis** for high-speed caching and rate limiting, **RabbitMQ** for asynchronous decoupling of the email service, and **Docker** for containerized deployment.
 
----
-
-## ☁️ Live Deployment & DevOps
-The application is fully hosted with a CI/CD pipeline. Below are the live deployment logs and Docker repository details, demonstrating a successful build and cloud integration.
-
-| Deployment Logs (Render) | Docker Repositories |
-| :--- | :--- |
-| ![Render Logs](./screenshots/swagger/Renderlogs.png) | ![Docker Repos](./screenshots/swagger/docker-repos.png) |
+The application is fully hosted on **Render** with a CI/CD pipeline integrated via GitHub Actions and Docker Hub.
 
 ---
 
-## 📖 API Documentation (Swagger UI)
-
-The API is fully documented using **Swagger/OpenAPI**. Below is a detailed visual breakdown of the available endpoints, controllers, and data models.
-
-### 1. Controller Overview
-The API is split into logical controllers for Authentication, User Management, URL operations, and Admin tasks.
-
-| **Auth Controller** | **Admin & Redirect Controllers** |
-| :--- | :--- |
-| Handles secure login, registration, and token generation. | Manages system-wide settings and the core URL redirection logic. |
-| ![Auth Controller](./screenshots/swagger/swagger-auth-controller.png) | ![Admin & Redirect](./screenshots/swagger/admin-user-management-and-redirect-controllers.png) |
-
-### 2. URL & User Management
-Dedicated endpoints for users to manage their profiles and their shortened URL portfolio.
-
-!https://frontegg.com/guides/user-management(./screenshots/swagger/Swagger-url-management-user-management.png)
-
-### 3. Data Transfer Objects (DTOs)
-Strictly typed Request/Response schemas ensure type safety across the application.
-
-![Request DTOs](./screenshots/swagger/request-dtos.png)
+## 📑 Table of Contents
+1. [Project Overview](#-project-overview)
+2. [Visual Walkthrough](#-visual-walkthrough)
+    - [Live Deployment](#1-live-deployment--devops)
+    - [API Documentation (Swagger)](#2-api-documentation-swagger-ui)
+    - [Database & Schema](#3-database--schema-design)
+    - [Functional Testing (Postman)](#4-functional-testing-postman)
+3. [Architecture & Design](#-architecture--design)
+4. [Project Structure](#-project-structure)
+5. [Environment Configuration](#-environment-configuration)
+6. [Getting Started](#-getting-started)
+7. [Troubleshooting](#-troubleshooting)
 
 ---
 
-## 📊 Database & Schema Design
+## 💻 Visual Walkthrough
 
-The application uses a relational database to manage users, URL mappings, and analytics data efficiently.
+### 1. Live Deployment & DevOps
+The application utilizes a cloud-native approach. The source code is built into a Docker image, pushed to Docker Hub, and deployed automatically to Render.
 
-### Database Visualization
-A visual representation of the tables and the live Users database content.
-
-| Database Visualization | Live Users Table |
+| **Render Deployment Logs** | **Docker Hub Repository** |
 | :--- | :--- |
-| ![DB Visual](./screenshots/swagger/dBvisual.png) | ![Users DB](./screenshots/swagger/UsersDB.png) |
+| *Successful build and deploy logs from the cloud hosting provider.* | *Container images stored and versioned in Docker Hub.* |
+| ![Render Logs](screenshots/swagger/Renderlogs.png) | ![Docker Repos](screenshots/swagger/docker-repos.png) |
 
----
+### 2. API Documentation (Swagger UI)
+Interactive documentation is available via Swagger/OpenAPI 3.0. This allows frontend developers and QA engineers to understand the contract without diving into the code.
 
-## 💻 Functional Walkthrough (Postman Tests)
+**Authentication & Admin Controllers:**
+Secure endpoints for user registration, login (JWT), and administrator-level user management.
 
-### 1. Infrastructure & Caching
-The system uses **Redis** for low-latency caching and rate limiting, and **RabbitMQ** to handle asynchronous tasks like email notifications.
-
-| Redis Caching & Rate Limiting | RabbitMQ Message Queues |
+| **Auth Controller** | **Admin & User Management** |
 | :--- | :--- |
-| ![Redis Cache](./screenshots/postman/cmd-redis-cache-url-and-rate-limit-keys.png) | ![RabbitMQ](./screenshots/postman/rabbit-mq-queues-cloud.png) |
+| ![Auth API](screenshots/swagger/swagger-auth-controller.png) | ![Admin API](screenshots/swagger/admin-user-management-and-redirect-controllers.png) |
 
-### 2. User Authentication & Email Verification
-Secure onboarding flow using asynchronous email verification tokens.
+**URL Management & DTOs:**
+The core business logic handles URL creation, expiration, and redirection. Strictly typed Data Transfer Objects (DTOs) ensure data integrity.
 
-* **Registration:** Users receive a unique token via email.
-* **Verification:** Secure endpoint to validate the account.
-* **Validation:** Robust error handling for existing users.
+| **URL Management Endpoints** | **Request DTO Models** |
+| :--- | :--- |
+| !https://en.wikipedia.org/wiki/API(screenshots/swagger/Swagger-url-management-user-management.png) | ![DTOs](screenshots/swagger/request-dtos.png) |
 
-| Email Token Received | Account Verified | Duplicate User Handling |
+### 3. Database & Schema Design
+The backend is powered by a relational database (MySQL/PostgreSQL) designed to handle relationships between Users, URLs, and Click Analytics.
+
+| **Database Visualization** | **Live Users Table** |
+| :--- | :--- |
+| *Visual representation of the data tables.* | *Snapshot of the live database verifying user persistence.* |
+| ![DB Visual](screenshots/swagger/dBvisual.png) | ![Users DB](screenshots/swagger/UsersDB.png) |
+
+### 4. Functional Testing (Postman)
+Comprehensive testing was conducted locally to ensure reliability before deployment.
+
+**User Onboarding & Email Flow (RabbitMQ):**
+This flow demonstrates the asynchronous nature of the application. The main service sends a message to the RabbitMQ queue, which the Email Service consumes to send a verification code.
+
+| **Step 1: Email Token Received** | **Step 2: Account Verified** | **Step 3: Duplicate Check** |
 | :--- | :--- | :--- |
-| ![Email Token](./screenshots/postman/gmail-verification-token.png) | ![Verified](./screenshots/postman/account-verified.png) | ![User Exists](./screenshots/postman/user-already-exists.png) |
+| ![Token](screenshots/postman/gmail-verification-token.png) | ![Verified](screenshots/postman/account-verified.png) | ![Exists](screenshots/postman/user-already-exists.png) |
 
-### 3. Core Features & Analytics
-Users can generate short links, create QR codes, and track usage data including IP addresses and click counts.
+**Performance & Analytics:**
+Redis is used to cache frequently accessed URLs and limit request rates from specific IP addresses to prevent abuse.
 
-| QR Code Generation | Analytics (Click Events) | Rate Limiting Protection |
+| **QR Code Generation** | **Redis Caching Logs** | **Analytics & IP Tracking** |
 | :--- | :--- | :--- |
-| ![QR Code](./screenshots/postman/create-qr.png) | ![Analytics](./screenshots/postman/click-events-with-user-ip.png) | ![Rate Limit](./screenshots/postman/too-manyreqs-limit-exceeded.png) |
+| ![QR Code](screenshots/postman/create-qr.png) | ![Redis Logs](screenshots/postman/cmd-redis-cache-url-and-rate-limit-keys.png) | ![Analytics](screenshots/postman/click-events-with-user-ip.png) |
 
 ---
 
-## 🛠️ Project Architecture & Structure
+## 🛠 Project Architecture
 
-The project follows a **Microservices-ready** layered architecture to ensure separation of concerns and scalability:
+The solution uses a **Layered Architecture** to separate concerns:
 
-* **`com.vishal.urlshortener.config`**: Configurations for Redis, RabbitMQ, Swagger, and CORS.
-* **`com.vishal.urlshortener.controller`**: REST APIs for Auth, URL operations, and Admin tasks.
-* **`com.vishal.urlshortener.entity`**: JPA Data models (User, Url, Analytics).
-* **`com.vishal.urlshortener.service`**: Business logic including Caching strategies and Message production.
-* **`com.vishal.urlshortener.consumer`**: RabbitMQ consumers for processing email tasks.
-* **`com.vishal.urlshortener.repository`**: Data Access Layer (SQL).
-* **`docker`**: Containerization setup for the App, Redis, and Database.
+* **Controller Layer:** Handles incoming REST requests.
+* **Service Layer:** Contains business logic (Shortening algorithm, Caching strategy).
+* **Repository Layer:** Direct database interaction using JPA.
+* **Async Layer:** RabbitMQ Producer/Consumer for email tasks.
 
----
-
-## ⚙️ Technologies Used
-
-* **Backend:** Java, Spring Boot, Spring Security.
-* **Documentation:** Swagger UI (OpenAPI 3.0).
-* **Caching:** Redis (Key-value store & Rate Limiting).
-* **Messaging:** RabbitMQ (Asynchronous communication).
-* **Database:** MySQL / PostgreSQL.
-* **DevOps:** Docker, Render (Cloud Hosting).
+**Key Technologies:**
+* **Backend:** Java 17, Spring Boot 3.x
+* **Database:** MySQL / PostgreSQL
+* **Caching:** Redis (Jedis Client)
+* **Message Broker:** RabbitMQ
+* **Containerization:** Docker
+* **Tools:** Lombok, Swagger UI, Maven
 
 ---
 
-## 🚀 Getting Started
+## 📂 Project Structure
 
-1.  **Clone the project:**
-    ```bash
-    git clone [https://github.com/vishalgit101/UrlShortener-RedisCaching-EmailMicroService-RabbitMQ-Backend.git](https://github.com/vishalgit101/UrlShortener-RedisCaching-EmailMicroService-RabbitMQ-Backend.git)
-    ```
-2.  **Infrastructure Setup (Docker):**
-    Ensure Docker is running, then spin up the containers:
-    ```bash
-    docker-compose up --build
-    ```
-3.  **Manual Configuration:**
-    If running locally without Docker, update `application.properties` with your Redis, RabbitMQ, and SQL credentials.
-4.  **Explore API:**
-    * **Swagger UI:** `http://localhost:8080/swagger-ui.html`
-    * **Postman:** Import the collection found in the `postman/` folder.
+A high-level overview of the source code organization:
+
+```text
+com.vishal.urlshortener
+├── config              # Configuration classes (Security, Swagger, Redis, CORS)
+├── controller          # REST Controllers (AuthController, UrlController)
+├── model               # JPA Entities (User, Url, Analytics)
+├── dto                 # Data Transfer Objects (LoginRequest, UrlRequest)
+├── repository          # Spring Data JPA Interfaces
+├── service             # Business Logic (UrlService, EmailService)
+├── security            # JWT Authentication filters and logic
+├── utils               # Helper classes (CodeGenerator, QRCodeGenerator)
+└── UrlShortenerApplication.java  # Main entry point
