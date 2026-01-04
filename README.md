@@ -24,7 +24,6 @@ The repository includes a comprehensive Postman collection to facilitate immedia
 1.  Navigate to the **postman** folder in the root directory.
 2.  Open Postman and click on **Import**.
 3.  Drag and drop the `UrlShortener.postman_collection.json` file.
-4.  Set up your environment variables (e.g., `baseUrl`) to point to `http://localhost:8080` for local testing.
    
 ---
 
