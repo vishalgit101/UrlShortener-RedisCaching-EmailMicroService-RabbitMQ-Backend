@@ -7,6 +7,28 @@ The application is fully hosted on **Render** with a CI/CD pipeline integrated v
 
 ---
 
+## 📺 Project Demonstrations
+Explore the application in action through these video walkthroughs:
+
+* **Local Environment:** [Testing via Postman & Local Services](https://youtu.be/uP6X6VaUNBs)
+* **Hosted Environment:** [Swagger UI & Production Cloud Demo](https://youtu.be/s5jkLdKMoq8)
+
+---
+
+## ☁️ Live Deployment & DevOps
+The application utilizes a cloud-native approach. The source code is built into a Docker image and deployed to Render.
+
+| **Render Deployment Logs** | **Docker Repository** |
+| :--- | :--- |
+| ![Render Logs](screenshots/swagger/Renderlogs.png) | ![Docker Repos](screenshots/swagger/docker-repos.png) |
+
+---
+
+## 📖 API Documentation (Swagger UI)
+Interactive documentation is available for the live environment. This allows for real-time testing of endpoints without local setup.
+
+**🔗 Live Link:** [Swagger UI Dashboard](https://urlshortener-app-1-0.onrender.com/swagger-ui/index.html)
+
 ## 📑 Table of Contents
 1. [Project Overview](#-project-overview)
 2. [Visual Walkthrough](#-visual-walkthrough)
