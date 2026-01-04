@@ -74,7 +74,7 @@ Handling asynchronous email messages.
 **RabbitMQ Queues:**
 | **RabbitMQ Queues** | **RabbitMQ Cloud** | **Shorten Url** |
 | :--- | :--- | :--- |
-| ![RabbitMQ Queues](screenshots/postman/Queues.png) | ![RabbitMQ Cloud](screenshots/postman/rabbit-mq-queues-cloud.png)| ![Shorten Url](postman-collection-url-shorten.png) |
+| ![RabbitMQ Queues](screenshots/postman/Queues.png) | ![RabbitMQ Cloud](screenshots/postman/rabbit-mq-queues-cloud.png)| ![Shorten Url](screenshots/postman/postman-collection-url-shorten.png) |
 
 **Performance & Analytics:**
 Redis is used to cache frequently accessed URLs and limit request rates from specific IP addresses to prevent abuse.
