@@ -7,7 +7,7 @@ The application is fully hosted on **Render** with a CI/CD pipeline integrated v
 
 ---
 
-## 📺 Project Demonstrations
+## 📺 Project Demonstrations Videos
 Explore the application in action through these video walkthroughs:
 
 * **Local Environment:** [Testing via Postman & Local Services](https://youtu.be/uP6X6VaUNBs)
