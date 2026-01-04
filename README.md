@@ -67,6 +67,15 @@ This flow demonstrates the asynchronous nature of the application. The main serv
 | :--- | :--- | :--- |
 | ![Token](screenshots/postman/gmail-verification-token.png) | ![Verified](screenshots/postman/account-verified.png) | ![Exists](screenshots/postman/user-already-exists.png) |
 
+
+Handling asynchronous email messages.
+!
+!
+**RabbitMQ Queues:**
+| **RabbitMQ Queues** | **RabbitMQ Cloud** | **Shorten Url** |
+| :--- | :--- | :--- |
+| ![RabbitMQ Queues](screenshots/postman/Queues.png) | ![RabbitMQ Cloud](screenshots/postman/rabbit-mq-queues-cloud.png)| ![Shorten Url](postman-collection-url-shorten.png) |
+
 **Performance & Analytics:**
 Redis is used to cache frequently accessed URLs and limit request rates from specific IP addresses to prevent abuse.
 
