@@ -15,6 +15,19 @@ Explore the application in action through these video walkthroughs:
 
 ---
 
+## 📂 Postman Collection & Testing
+The repository includes a comprehensive Postman collection to facilitate immediate testing of all API endpoints.
+
+**Location:** `postman/UrlShortener.postman_collection.json`
+
+### How to use the collection:
+1.  Navigate to the **postman** folder in the root directory.
+2.  Open Postman and click on **Import**.
+3.  Drag and drop the `UrlShortener.postman_collection.json` file.
+4.  Set up your environment variables (e.g., `baseUrl`) to point to `http://localhost:8080` for local testing.
+   
+---
+
 ## ☁️ Live Deployment & DevOps
 The application utilizes a cloud-native approach. The source code is built into a Docker image and deployed to Render.
 
