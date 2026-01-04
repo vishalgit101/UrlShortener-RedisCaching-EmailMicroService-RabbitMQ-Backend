@@ -127,6 +127,7 @@ The solution uses a **Layered Architecture** to separate concerns:
 * **Service Layer:** Contains business logic (Shortening algorithm, Caching strategy).
 * **Repository Layer:** Direct database interaction using JPA.
 * **Async Layer:** RabbitMQ Producer/Consumer for email tasks.
+* **Caching Layer:** Redis Caching and Redis Rate limiting to prevent abusse.
 
 **Key Technologies:**
 * **Backend:** Java 21, Spring Boot 3.x
