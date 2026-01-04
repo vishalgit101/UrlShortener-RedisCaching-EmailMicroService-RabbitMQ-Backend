@@ -7,7 +7,7 @@ A high-performance, asynchronous URL shortening service built with **Spring Boot
 ## 📊 Database Design & Schema
 The project uses **PostgreSQL** for persistent storage of users, shortened URLs, and detailed click analytics.
 
-![Database Schema](./Images/url-shortener-database-schema.png)
+![Database Schema](./screenshots/url-shortener-database-schema.png)
 
 ---
 
