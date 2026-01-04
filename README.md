@@ -1,17 +1,58 @@
-# 🚀 UrlShortener - High Performance Microservices Backend
 
-A scalable, enterprise-grade **Spring Boot** application designed to handle URL shortening with high throughput. This project leverages a Microservices architecture featuring **Redis** for caching, **RabbitMQ** for asynchronous messaging, and a dedicated Email Service.
+  
+# 🚀 UrlShortener - Hosted Microservices Backend
+
+A scalable, enterprise-grade **Spring Boot** application designed to handle URL shortening with high throughput. This project leverages a Microservices architecture featuring **Redis** for caching, **RabbitMQ** for asynchronous messaging, and is fully containerized and hosted on **Render**.
 
 ---
 
-## 📊 Database Schema
+## ☁️ Live Deployment & DevOps
+The application is fully hosted with a CI/CD pipeline. Below are the live deployment logs and Docker repository details, demonstrating a successful build and cloud integration.
+
+| Deployment Logs (Render) | Docker Repositories |
+| :--- | :--- |
+| ![Render Logs](./screenshots/swagger/Renderlogs.png) | ![Docker Repos](./screenshots/swagger/docker-repos.png) |
+
+---
+
+## 📖 API Documentation (Swagger UI)
+
+The API is fully documented using **Swagger/OpenAPI**. Below is a detailed visual breakdown of the available endpoints, controllers, and data models.
+
+### 1. Controller Overview
+The API is split into logical controllers for Authentication, User Management, URL operations, and Admin tasks.
+
+| **Auth Controller** | **Admin & Redirect Controllers** |
+| :--- | :--- |
+| Handles secure login, registration, and token generation. | Manages system-wide settings and the core URL redirection logic. |
+| ![Auth Controller](./screenshots/swagger/swagger-auth-controller.png) | ![Admin & Redirect](./screenshots/swagger/admin-user-management-and-redirect-controllers.png) |
+
+### 2. URL & User Management
+Dedicated endpoints for users to manage their profiles and their shortened URL portfolio.
+
+!https://frontegg.com/guides/user-management(./screenshots/swagger/Swagger-url-management-user-management.png)
+
+### 3. Data Transfer Objects (DTOs)
+Strictly typed Request/Response schemas ensure type safety across the application.
+
+![Request DTOs](./screenshots/swagger/request-dtos.png)
+
+---
+
+## 📊 Database & Schema Design
+
 The application uses a relational database to manage users, URL mappings, and analytics data efficiently.
 
-![ERD](./screenshots/postman/erd-urlshortener.png)
+### Database Visualization
+A visual representation of the tables and the live Users database content.
+
+| Database Visualization | Live Users Table |
+| :--- | :--- |
+| ![DB Visual](./screenshots/swagger/dBvisual.png) | ![Users DB](./screenshots/swagger/UsersDB.png) |
 
 ---
 
-## 💻 Visual Walkthrough
+## 💻 Functional Walkthrough (Postman Tests)
 
 ### 1. Infrastructure & Caching
 The system uses **Redis** for low-latency caching and rate limiting, and **RabbitMQ** to handle asynchronous tasks like email notifications.
@@ -57,11 +98,11 @@ The project follows a **Microservices-ready** layered architecture to ensure sep
 ## ⚙️ Technologies Used
 
 * **Backend:** Java, Spring Boot, Spring Security.
+* **Documentation:** Swagger UI (OpenAPI 3.0).
 * **Caching:** Redis (Key-value store & Rate Limiting).
 * **Messaging:** RabbitMQ (Asynchronous communication).
 * **Database:** MySQL / PostgreSQL.
-* **DevOps:** Docker, Docker Compose.
-* **Testing:** Postman (Collection included).
+* **DevOps:** Docker, Render (Cloud Hosting).
 
 ---
 
