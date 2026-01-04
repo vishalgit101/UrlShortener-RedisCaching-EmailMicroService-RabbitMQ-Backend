@@ -1,90 +1,91 @@
-# 🔗 Advanced URL Shortener Backend
+# URL Shortener with Redis Caching, RabbitMQ & Email Microservice
 
-A high-performance, asynchronous URL shortening service built with **Spring Boot 3** and **Java 21**. This backend leverages **Redis** for ultra-fast redirects and rate limiting, while **RabbitMQ** handles heavy lifting like email verification in the background.
+A high-performance, scalable URL Shortener application built with a Microservices architecture. This project features asynchronous email notifications, distributed caching for low latency, rate limiting to prevent abuse, and comprehensive analytics.
 
----
+## 🚀 Tech Stack
 
-## 📊 Database Design & Schema
-The project uses **PostgreSQL** for persistent storage of users, shortened URLs, and detailed click analytics.
-
-![Database Schema](./screenshots/url-shortener-database-schema.png)
-
----
-
-## 🚀 Live Demo & Testing
-* **Live API Documentation:** [Swagger UI on Render](https://urlshortener-app-1-0.onrender.com/swagger-ui/index.html)
-* **Note on Hosted Version:** Due to Render's SMTP port restrictions, email features (verification/password reset) are only available in the **Local Environment**.
+* **Backend:** Java, Spring Boot
+* **Database:** SQL (MySQL/PostgreSQL)
+* **Caching:** Redis (Key-value store)
+* **Message Broker:** RabbitMQ (Asynchronous communication)
+* **Containerization:** Docker
+* **Testing:** Postman
+* **Documentation:** Swagger UI
 
 ---
 
-## 🛠️ Tech Stack
-* **Language:** Java 21
-* **Framework:** Spring Boot 3
-* **Database:** PostgreSQL
-* **Caching & Rate Limiting:** Redis (Dockerized)
-* **Message Broker:** RabbitMQ (Email Microservice)
-* **Testing & Documentation:** Postman & Swagger UI
-* **Deployment:** Render & Docker
+## ✨ Key Features
+
+* **URL Shortening:** Generate short aliases for long URLs.
+* **QR Code Generation:** Automatically generate QR codes for shortened links.
+* **Rate Limiting:** IP-based rate limiting using Redis to prevent DDoS/spam.
+* **Analytics:** Track click events, user IP addresses, and usage statistics.
+* **User Management:** Authentication (Login/Register) and Role-based access (Admin/User).
+* **Async Email Service:** Email verification and notifications decoupled via RabbitMQ.
+* **Docker Support:** Fully containerized application.
 
 ---
 
-## 🌟 Key Features
+## 📸 Screenshots & Testing Evidence
 
-### ⚡ Performance & Caching
-* **Redis Integration:** Short-to-original URL resolution is cached in Redis to minimize database hits and ensure sub-millisecond redirects.
-* **Rate Limiting:** Redis-based throttling protects the API from abuse and brute-force attacks.
+The project has been thoroughly tested locally using Postman. Below are screenshots demonstrating the architecture, database design, and successful API responses.
 
-### ✉️ Asynchronous Processing
-* **RabbitMQ:** User registration and password reset flows are non-blocking. The system pushes email tasks to RabbitMQ, which are then processed by a dedicated worker.
+### 1. Architecture & Database Design
+**Entity Relationship Diagram (ERD):**
+The database schema designed for users, URLs, and analytics.
+![ERD](screenshots/postman/erd-urlshortener.png)
 
-### 📈 Analytics & Security
-* **Click Tracking:** Captures visitor IP addresses and timestamps for every redirect.
-* **Role-Based Access:** Admin-only endpoints for system-wide analytics and management.
-* **JWT Authentication:** Secure user flows for registration, login, and URL management.
+### 2. Infrastructure (Redis, RabbitMQ & Docker)
+**RabbitMQ Queues:**
+Handling asynchronous email messages.
+![RabbitMQ Queues](screenshots/postman/Queues.png)
+![RabbitMQ Cloud](screenshots/postman/rabbit-mq-queues-cloud.png)
 
----
+**Redis Caching & Rate Limiting:**
+Console logs showing cache hits and rate limiting logic.
+![Redis Cache](screenshots/postman/cmd-redis-cache-url-and-rate-limiting.png)
+![Rate Limit Exceeded](screenshots/postman/too-manyreqs-limit-exceeded.png)
 
-## 📸 Project Walkthrough
+**Docker Repositories:**
+![Docker](screenshots/postman/docker-repos.png)
 
-### 1. Hosted API (Swagger)
-The production environment is documented with Swagger, allowing for real-time testing of URL creation and redirection.
+### 3. Core Functionality (Postman Tests)
 
-![Swagger UI Demo](./Images/hosted-swagger-demo.png)
+**User Registration & Verification:**
+* **Verification Token via Email:**
+    ![Email Token](screenshots/postman/gmail-verification-token.png)
+* **Account Verified:**
+    ![Account Verified](screenshots/postman/account-verified.png)
+* **User Already Exists Error:**
+    ![User Exists](screenshots/postman/user-already-exists.png)
 
-### 2. Local Testing (Postman)
-Full system testing including the RabbitMQ email worker and PostgreSQL data integrity.
+**URL Operations:**
+* **Shortening Service:**
+    !https://www.shorturl.at/(screenshots/postman/postman-collection-url-shortener.png)
+* **QR Code Creation:**
+    ![Create QR](screenshots/postman/create-qr.png)
+* **My URLs List:**
+    ![My URLs](screenshots/postman/postman-collection-myurls.png)
 
-| API Testing Flow | Feature Highlight |
-| :--- | :--- |
-| **Postman Testing** | ![Postman API testing](./Images/Postman-API-testing.png) |
-| **User Onboarding** | Registration & Email Verification Flow |
-| **Redirect Logic** | Redis Caching & IP Tracking |
+**Analytics:**
+* **Click Events & IP Tracking:**
+    ![Click Events](screenshots/postman/click-events-with-user-ip.png)
 
----
-
-## ⚙️ Local Setup
-
-1.  **Clone the Repository:**
-    ```bash
-    git clone [https://github.com/vishalgit101/UrlShortener-RedisCaching-EmailMicroService-RabbitMQ-Backend.git](https://github.com/vishalgit101/UrlShortener-RedisCaching-EmailMicroService-RabbitMQ-Backend.git)
-    ```
-
-2.  **Run Infrastructure (Docker):**
-    Ensure you have Redis and RabbitMQ running:
-    ```bash
-    docker run -d --name redis -p 6379:6379 redis
-    docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
-    ```
-
-3.  **Configure Environment:**
-    Update `src/main/resources/application.properties` with your PostgreSQL and SMTP (Gmail/Mailtrap) credentials.
-
-4.  **Build and Run:**
-    ```bash
-    mvn spring-boot:run
-    ```
+### 4. Database Verification
+**SQL User Table:**
+Snapshot of the database verifying user persistence.
+![SQL Users](screenshots/postman/sql-users.png)
 
 ---
 
-## 📧 Contact & Support
-Developed by **Vishal**. Feel free to reach out for any questions regarding the Redis caching logic or RabbitMQ implementation!
+## 🛠️ Installation & Setup
+
+### Prerequisites
+* Java 17+
+* Maven
+* Docker & Docker Compose
+
+### Running with Docker (Recommended)
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/vishalgit101/UrlShortener-RedisCaching-EmailMicroService-RabbitMQ-Backend.git](https://github.com/vishalgit101/UrlShortener-RedisCaching-EmailMicroService-RabbitMQ-Backend.git)
