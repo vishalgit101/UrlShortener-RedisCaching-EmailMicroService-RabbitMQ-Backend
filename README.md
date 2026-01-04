@@ -47,7 +47,7 @@ The core business logic handles URL creation, expiration, and redirection. Stric
 
 | **URL Management Endpoints** | **Request DTO Models** |
 | :--- | :--- |
-| !https://en.wikipedia.org/wiki/API(screenshots/swagger/Swagger-url-management-user-management.png) | ![DTOs](screenshots/swagger/request-dtos.png) |
+| ![Auth API](screenshots/swagger/Swagger-url-management-user-management.png) | ![DTOs](screenshots/swagger/request-dtos.png) |
 
 ### 3. Database & Schema Design
 The backend is powered by a relational database (MySQL/PostgreSQL) designed to handle relationships between Users, URLs, and Click Analytics.
