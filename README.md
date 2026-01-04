@@ -129,27 +129,9 @@ The solution uses a **Layered Architecture** to separate concerns:
 * **Async Layer:** RabbitMQ Producer/Consumer for email tasks.
 
 **Key Technologies:**
-* **Backend:** Java 17, Spring Boot 3.x
+* **Backend:** Java 21, Spring Boot 3.x
 * **Database:** MySQL / PostgreSQL
-* **Caching:** Redis (Jedis Client)
-* **Message Broker:** RabbitMQ
+* **Caching:** Redis Caching and Rate Limiting
+* **Message Broker:** RabbitMQ with Email Microservice
 * **Containerization:** Docker
 * **Tools:** Lombok, Swagger UI, Maven
-
----
-
-## 📂 Project Structure
-
-A high-level overview of the source code organization:
-
-```text
-com.vishal.urlshortener
-├── config              # Configuration classes (Security, Swagger, Redis, CORS)
-├── controller          # REST Controllers (AuthController, UrlController)
-├── model               # JPA Entities (User, Url, Analytics)
-├── dto                 # Data Transfer Objects (LoginRequest, UrlRequest)
-├── repository          # Spring Data JPA Interfaces
-├── service             # Business Logic (UrlService, EmailService)
-├── security            # JWT Authentication filters and logic
-├── utils               # Helper classes (CodeGenerator, QRCodeGenerator)
-└── UrlShortenerApplication.java  # Main entry point
