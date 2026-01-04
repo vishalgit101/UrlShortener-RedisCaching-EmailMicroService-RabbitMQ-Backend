@@ -18,7 +18,7 @@ The system uses **Redis** for low-latency caching and rate limiting, and **Rabbi
 
 | Redis Caching & Rate Limiting | RabbitMQ Message Queues |
 | :--- | :--- |
-| ![Redis Cache](./screenshots/postman/cmd-redis-cache-url-and-rate-limiting.png) | ![RabbitMQ](./screenshots/postman/rabbit-mq-queues-cloud.png) |
+| ![Redis Cache](./screenshots/postman/cmd-redis-cache-url-and-rate-limit-keys.png) | ![RabbitMQ](./screenshots/postman/rabbit-mq-queues-cloud.png) |
 
 ### 2. User Authentication & Email Verification
 Secure onboarding flow using asynchronous email verification tokens.
